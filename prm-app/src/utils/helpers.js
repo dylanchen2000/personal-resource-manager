@@ -37,3 +37,17 @@ export function formatDate(ts) {
 export function todayStr() {
   return formatDate(Date.now())
 }
+
+// 距离天数（正数=过去N天，负数=未来N天）
+export function daysSince(ts) {
+  if (!ts) return Infinity
+  return Math.floor((Date.now() - ts) / 86400000)
+}
+
+// 格式化金额
+export function formatAmount(amount) {
+  if (!amount) return ''
+  const n = parseFloat(amount)
+  if (isNaN(n)) return amount
+  return n.toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+}

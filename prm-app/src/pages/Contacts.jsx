@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, Users } from 'lucide-react'
-import { getContacts, getCircles, saveContact, deleteContact, FAVOR_TYPES, STRATEGY_TYPES } from '../utils/store'
+import { getContacts, getCircles, saveContact, deleteContact, FAVOR_TYPES, STRATEGY_TYPES, REMINDER_FREQUENCIES, getHealthColor, getContactDueInfo } from '../utils/store'
 import { nameColor, nameInitial, timeAgo } from '../utils/helpers'
 
 export default function Contacts({ onOpenContact, onRefresh }) {
@@ -10,6 +10,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
   const [filterCircle, setFilterCircle] = useState(null)
   const [filterFavor, setFilterFavor] = useState(null)
   const [filterStrategy, setFilterStrategy] = useState(null)
+  const [sortBy, setSortBy] = useState('due') // 'due' | 'name' | 'lastContact'
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState({})
 
@@ -31,6 +32,21 @@ export default function Contacts({ onOpenContact, onRefresh }) {
     return true
   })
 
+  // 排序
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'due') {
+      // 逾期的排前面，然后按即将到期
+      const dueA = getContactDueInfo(a)
+      const dueB = getContactDueInfo(b)
+      const scoreA = dueA.status === 'overdue' ? -1000 + dueA.daysOverdue : dueA.status === 'soon' ? -500 + (dueA.daysUntilDue || 0) : dueA.dueDate || Infinity
+      const scoreB = dueB.status === 'overdue' ? -1000 + dueB.daysOverdue : dueB.status === 'soon' ? -500 + (dueB.daysUntilDue || 0) : dueB.dueDate || Infinity
+      return scoreA - scoreB
+    }
+    if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '')
+    if (sortBy === 'lastContact') return (a.lastContact || 0) - (b.lastContact || 0)
+    return 0
+  })
+
   async function handleSave() {
     await saveContact({ ...form })
     setShowModal(false)
@@ -47,7 +63,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
   }
 
   function openAdd() {
-    setForm({ name: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '' })
+    setForm({ name: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '', reminderFreq: null, birthday: '', details: '' })
     setShowModal(true)
   }
 
@@ -89,41 +105,53 @@ export default function Contacts({ onOpenContact, onRefresh }) {
             <button key={s.value} className={`chip ${filterStrategy === s.value ? 'active' : ''}`} onClick={() => setFilterStrategy(filterStrategy === s.value ? null : s.value)}>{s.label}</button>
           ))}
         </div>
+        <div className="filter-chips" style={{ marginLeft: 'auto' }}>
+          <span style={{ fontSize: 12, color: 'var(--text-dim)', marginRight: 4 }}>排序:</span>
+          {[['due','按紧急度'],['name','按姓名'],['lastContact','按联系时间']].map(([val, label]) => (
+            <button key={val} className={`chip ${sortBy === val ? 'active' : ''}`} onClick={() => setSortBy(val)}>{label}</button>
+          ))}
+        </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {sorted.length === 0 ? (
         <div className="empty-state">
           <Users size={48} />
           <p>{contacts.length === 0 ? '还没有联系人' : '没有匹配结果'}</p>
         </div>
       ) : (
         <div className="contact-list">
-          {filtered.map(c => (
-            <div key={c.id} className="contact-row" onClick={() => onOpenContact(c.id)}>
-              <div className="contact-avatar" style={{ background: nameColor(c.name) }}>
-                {nameInitial(c.name)}
+          {sorted.map(c => {
+            const healthColor = getHealthColor(c)
+            return (
+              <div key={c.id} className="contact-row" onClick={() => onOpenContact(c.id)}>
+                {/* 健康度色条 */}
+                <div style={{ width: 4, height: 42, borderRadius: 2, background: healthColor, flexShrink: 0 }} />
+                <div className="contact-avatar" style={{ background: nameColor(c.name) }}>
+                  {nameInitial(c.name)}
+                </div>
+                <div className="contact-info">
+                  <div className="name">{c.name}</div>
+                  <div className="sub">{[c.company, c.title].filter(Boolean).join(' | ')}</div>
+                </div>
+                <div className="contact-tags">
+                  {c.circles?.map(ci => (
+                    <span key={ci} className="circle-tag" style={{ borderColor: circles.find(x => x.name === ci)?.color || 'var(--border)' }}>
+                      {ci}
+                    </span>
+                  ))}
+                  {c.favor === '有恩于我' && <span className="badge badge-favor-me">有恩于我</span>}
+                  {c.favor === '有恩于他' && <span className="badge badge-favor-them">有恩于他</span>}
+                  {c.strategy === '加密' && <span className="badge badge-strengthen">加密</span>}
+                  {c.strategy === '保持' && <span className="badge badge-maintain">保持</span>}
+                  {c.strategy === '淡出' && <span className="badge badge-fadeout">淡出</span>}
+                </div>
+                <div className="contact-meta">
+                  <div>{c.lastContact ? timeAgo(c.lastContact) : '从未联系'}</div>
+                  {c.reminderFreq && <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{c.reminderFreq}</div>}
+                </div>
               </div>
-              <div className="contact-info">
-                <div className="name">{c.name}</div>
-                <div className="sub">{[c.company, c.title].filter(Boolean).join(' | ')}</div>
-              </div>
-              <div className="contact-tags">
-                {c.circles?.map(ci => (
-                  <span key={ci} className="circle-tag" style={{ borderColor: circles.find(x => x.name === ci)?.color || 'var(--border)' }}>
-                    {ci}
-                  </span>
-                ))}
-                {c.favor === '有恩于我' && <span className="badge badge-favor-me">有恩于我</span>}
-                {c.favor === '有恩于他' && <span className="badge badge-favor-them">有恩于他</span>}
-                {c.strategy === '加密' && <span className="badge badge-strengthen">加密</span>}
-                {c.strategy === '保持' && <span className="badge badge-maintain">保持</span>}
-                {c.strategy === '淡出' && <span className="badge badge-fadeout">淡出</span>}
-              </div>
-              <div className="contact-meta">
-                {c.lastContact ? timeAgo(c.lastContact) : '从未联系'}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -152,9 +180,15 @@ export default function Contacts({ onOpenContact, onRefresh }) {
                 <input value={form.company || ''} onChange={e => setForm({ ...form, company: e.target.value })} placeholder="所在公司" />
               </div>
             </div>
-            <div className="form-group">
-              <label>职位</label>
-              <input value={form.title || ''} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="职位/角色" />
+            <div className="form-row">
+              <div className="form-group">
+                <label>职位</label>
+                <input value={form.title || ''} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="职位/角色" />
+              </div>
+              <div className="form-group">
+                <label>生日</label>
+                <input type="date" value={form.birthday || ''} onChange={e => setForm({ ...form, birthday: e.target.value })} />
+              </div>
             </div>
 
             <div className="form-group">
@@ -211,6 +245,26 @@ export default function Contacts({ onOpenContact, onRefresh }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="form-group">
+              <label>提醒频率</label>
+              <div className="option-group">
+                {REMINDER_FREQUENCIES.map(f => (
+                  <button
+                    key={f.label}
+                    className={`option-btn ${form.reminderFreq === f.value ? 'selected' : ''}`}
+                    onClick={() => setForm({ ...form, reminderFreq: f.value })}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>关心细节（孩子、宠物、爱好、偏好等）</label>
+              <textarea value={form.details || ''} onChange={e => setForm({ ...form, details: e.target.value })} placeholder="如：儿子叫小明，养了一只金毛叫Lucky，喜欢跑步..." rows={2} />
             </div>
 
             <div className="form-group">

@@ -1,14 +1,24 @@
 import { useState, useEffect } from 'react'
-import { AlertTriangle, HeartHandshake, Shield, Users, CircleDot, MessageSquare } from 'lucide-react'
-import { getStats } from '../utils/store'
+import { AlertTriangle, HeartHandshake, Shield, Users, CircleDot, MessageSquare, Clock, Cake, Zap } from 'lucide-react'
+import { getStats, getHealthColor, getContactDueInfo, bulkSnooze } from '../utils/store'
 import { timeAgo } from '../utils/helpers'
 
 export default function Dashboard({ onOpenContact, onNavigate }) {
   const [stats, setStats] = useState(null)
+  const [snoozing, setSnoozing] = useState(false)
 
   useEffect(() => {
     getStats().then(setStats)
   }, [])
+
+  async function handleBulkSnooze() {
+    if (!confirm('将所有积压提醒均匀分散到未来14天？')) return
+    setSnoozing(true)
+    const count = await bulkSnooze(14)
+    alert(`已分散 ${count} 条提醒到未来14天`)
+    setSnoozing(false)
+    getStats().then(setStats)
+  }
 
   if (!stats) return <div className="empty-state"><p>加载中...</p></div>
 
@@ -45,12 +55,99 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
         </div>
       </div>
 
-      {/* 需要关注的人 */}
+      {/* 今日生日 */}
+      {stats.birthdayToday.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 16, color: 'var(--text-h)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Cake size={16} color="var(--pink)" />
+            今日生日
+          </h3>
+          {stats.birthdayToday.map(c => (
+            <div key={c.id} className="reminder-item" onClick={() => onOpenContact(c.id)} style={{ cursor: 'pointer', borderColor: 'var(--pink)' }}>
+              <div className="reminder-dot" style={{ background: 'var(--pink)' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: 14 }}>{c.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
+                  {c.birthday} {c.circles?.length ? `| ${c.circles.join(', ')}` : ''}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 即将生日（7天内） */}
+      {stats.birthdaySoon.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 16, color: 'var(--text-h)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Cake size={16} color="var(--purple)" />
+            近期生日（7天内）
+          </h3>
+          {stats.birthdaySoon.map(c => (
+            <div key={c.id} className="reminder-item" onClick={() => onOpenContact(c.id)} style={{ cursor: 'pointer' }}>
+              <div className="reminder-dot" style={{ background: 'var(--purple)' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: 14 }}>{c.name}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
+                  生日 {c.birthday} {c.circles?.length ? `| ${c.circles.join(', ')}` : ''}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 今日待联系 - 核心视图 */}
+      {stats.todayDue.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 16, color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Clock size={16} color="var(--accent)" />
+              今日待联系 ({stats.todayDue.length})
+            </h3>
+            {stats.todayDue.length > 5 && (
+              <button className="btn btn-sm" onClick={handleBulkSnooze} disabled={snoozing}>
+                <Zap size={12} /> {snoozing ? '分散中...' : '一键分散'}
+              </button>
+            )}
+          </div>
+          {stats.todayDue.slice(0, 15).map(c => {
+            const due = getContactDueInfo(c)
+            const healthColor = getHealthColor(c)
+            return (
+              <div key={c.id} className="reminder-item" onClick={() => onOpenContact(c.id)} style={{ cursor: 'pointer' }}>
+                <div style={{ width: 4, height: 36, borderRadius: 2, background: healthColor, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: 14 }}>
+                    {c.name}
+                    {c.favor === '有恩于我' && <span className="badge badge-favor-me" style={{ marginLeft: 8 }}>有恩于我</span>}
+                    {c.strategy === '加密' && <span className="badge badge-strengthen" style={{ marginLeft: 8 }}>加密</span>}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
+                    {c.company || ''} {c.circles?.length ? `| ${c.circles.join(', ')}` : ''}
+                    {c.reminderFreq ? ` | ${c.reminderFreq}` : ''}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 12, color: healthColor, fontWeight: 600 }}>
+                    {due.status === 'overdue' ? `逾期${due.daysOverdue}天` : `${due.daysUntilDue}天后到期`}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>
+                    {c.lastContact ? timeAgo(c.lastContact) : '从未联系'}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* 需要关注的人（无提醒频率的加密联系人） */}
       {stats.needAttention.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <h3 style={{ fontSize: 16, color: 'var(--text-h)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <AlertTriangle size={16} color="var(--yellow)" />
-            需要加强联系（"加密"策略，30天+ 未联系）
+            需要加强联系（30天+ 未联系的"加密"联系人）
           </h3>
           {stats.needAttention.slice(0, 8).map(c => (
             <div key={c.id} className="reminder-item" onClick={() => onOpenContact(c.id)} style={{ cursor: 'pointer' }}>
