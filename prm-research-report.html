@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人资源管理App调研报告</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --accent: #6c5ce7;
+    --accent2: #00cec9;
+    --accent3: #fd79a8;
+    --accent4: #fdcb6e;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --green: #00b894;
+    --red: #d63031;
+    --orange: #e17055;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1a1d27 0%, #2d1b69 50%, #1a1d27 100%);
+    padding: 80px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #a78bfa, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+  }
+  .hero .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .hero .meta {
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  .section {
+    margin-bottom: 60px;
+  }
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-desc {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    font-size: 1rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card p { color: var(--text-dim); font-size: 0.95rem; }
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+  .tag-purple { background: rgba(108,92,231,.2); color: #a78bfa; }
+  .tag-teal { background: rgba(0,206,201,.2); color: #00cec9; }
+  .tag-pink { background: rgba(253,121,168,.2); color: #fd79a8; }
+  .tag-yellow { background: rgba(253,203,110,.2); color: #fdcb6e; }
+  .tag-green { background: rgba(0,184,148,.2); color: #00b894; }
+  .tag-red { background: rgba(214,48,49,.2); color: #ff7675; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2rem; }
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: rgba(108,92,231,.15);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { color: var(--text-dim); }
+  tr:hover td { color: var(--text); }
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(108,92,231,.1), rgba(0,206,201,.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .highlight-box h3 {
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 32px 16px;
+    margin: 24px 0;
+  }
+  .flow-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .flow-box .icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .flow-box .label { font-size: 0.85rem; font-weight: 600; }
+  .flow-box .desc { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+  .flow-arrow {
+    font-size: 1.2rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .circle-diagram {
+    position: relative;
+    width: 360px;
+    height: 360px;
+    margin: 32px auto;
+  }
+  .circle-ring {
+    position: absolute;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-outer {
+    width: 360px; height: 360px;
+    background: rgba(253,203,110,.08);
+    border: 2px solid rgba(253,203,110,.3);
+    top: 0; left: 0;
+  }
+  .ring-mid {
+    width: 240px; height: 240px;
+    background: rgba(0,206,201,.08);
+    border: 2px solid rgba(0,206,201,.3);
+    top: 60px; left: 60px;
+  }
+  .ring-inner {
+    width: 120px; height: 120px;
+    background: rgba(108,92,231,.15);
+    border: 2px solid rgba(108,92,231,.5);
+    top: 120px; left: 120px;
+  }
+  .ring-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    position: absolute;
+  }
+  .priority-matrix {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0;
+  }
+  .priority-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    padding: 16px 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px 0 0 8px;
+  }
+  .p0-label { background: rgba(0,184,148,.15); color: var(--green); }
+  .p1-label { background: rgba(108,92,231,.15); color: var(--accent); }
+  .p2-label { background: rgba(253,203,110,.15); color: var(--accent4); }
+  .priority-items {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 8px;
+  }
+  .priority-items ul {
+    list-style: none;
+    padding: 0;
+  }
+  .priority-items li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .priority-items li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .p0-items li::before { background: var(--green); }
+  .p1-items li::before { background: var(--accent); }
+  .p2-items li::before { background: var(--accent4); }
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--green), var(--accent), var(--accent4));
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -33px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+  .dot-green { border-color: var(--green); background: rgba(0,184,148,.3); }
+  .dot-purple { border-color: var(--accent); background: rgba(108,92,231,.3); }
+  .dot-yellow { border-color: var(--accent4); background: rgba(253,203,110,.3); }
+  .timeline-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .timeline-content h4 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  .timeline-content p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+  }
+  .score-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .score-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    width: 120px;
+  }
+  .score-value {
+    font-size: 0.75rem;
+    color: var(--text);
+    width: 30px;
+    text-align: right;
+  }
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    background: var(--card);
+  }
+  .arch-layer h4 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .arch-boxes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    background: rgba(108,92,231,.08);
+    border: 1px solid rgba(108,92,231,.2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    color: var(--text);
+    text-align: center;
+  }
+  .arch-box small {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    margin-top: 2px;
+  }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin: 32px 0 48px;
+  }
+  .toc h3 {
+    font-size: 1rem;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+  .toc ol {
+    padding-left: 20px;
+    list-style: decimal;
+  }
+  .toc li {
+    padding: 4px 0;
+    font-size: 0.9rem;
+  }
+  .toc a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .toc a:hover { color: var(--accent); }
+  .comparison-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .comparison-row:last-child { border-bottom: none; }
+  .comp-name {
+    width: 160px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .comp-bars { flex: 1; }
+  .strategy-card {
+    text-align: center;
+    padding: 32px 20px;
+  }
+  .strategy-card .big-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  .strategy-card h3 {
+    margin-bottom: 8px;
+  }
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    overflow-x: auto;
+    color: #c9d1d9;
+    margin: 16px 0;
+    line-height: 1.5;
+  }
+  .summary-stat {
+    text-align: center;
+    padding: 24px;
+  }
+  .summary-stat .num {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .summary-stat .label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>个人资源管理App 调研报告</h1>
+  <p class="subtitle">Personal Resource Manager (PRM) -- 人脉管理、环境优化、AI驱动的个人战略工具</p>
+  <p class="meta">2026-04-05 | 研究范围: 全球市场 + 技术方案 + 功能规划 + 商业模式</p>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h3>报告目录</h3>
+  <ol>
+    <li><a href="#market">全球竞品分析 -- 已有的类似产品</a></li>
+    <li><a href="#gap">市场空白与机会</a></li>
+    <li><a href="#concept">产品核心概念 -- "环境设计"</a></li>
+    <li><a href="#arch">技术架构设计</a></li>
+    <li><a href="#datamodel">数据模型</a></li>
+    <li><a href="#features">功能规划与优先级</a></li>
+    <li><a href="#roadmap">开发路线图</a></li>
+    <li><a href="#monetize">商业化策略</a></li>
+    <li><a href="#action">下一步行动建议</a></li>
+  </ol>
+</div>
+
+<!-- 1. MARKET ANALYSIS -->
+<div class="section" id="market">
+  <h2 class="section-title"><span class="num">1</span> 全球竞品分析</h2>
+  <p class="section-desc">调研了全球范围内的个人CRM/关系管理工具，涵盖商业产品、开源项目和AI驱动工具。</p>
+
+  <h3 style="margin-bottom:16px; color: var(--accent);">商业产品</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Dex (getdex.com)</h3>
+      <span class="tag tag-purple">Web+Mobile</span>
+      <span class="tag tag-teal">30,000+ 用户</span>
+      <p style="margin-top:8px;">最接近的竞品。核心功能: LinkedIn/邮件集成、联系频率提醒、关系备注、生日提醒。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 无AI建议、无圈层战略标记、无SWOT匹配</p>
+    </div>
+    <div class="card">
+      <h3>Monica (monicahq.com)</h3>
+      <span class="tag tag-green">开源</span>
+      <span class="tag tag-teal">PHP/Laravel</span>
+      <p style="margin-top:8px;">开源个人CRM的标杆。记录互动、家庭关系、活动、礼物、笔记。GitHub 21k+ Stars。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 无AI功能、无自动化、无关系评分</p>
+    </div>
+    <div class="card">
+      <h3>Clay (clay.earth)</h3>
+      <span class="tag tag-purple">Web</span>
+      <span class="tag tag-pink">AI驱动</span>
+      <p style="margin-top:8px;">自动从邮件/日历/社交媒体同步联系人数据。有AI助手帮助筛选和推荐联系人。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 偏向B2B销售、无个人战略规划</p>
+    </div>
+    <div class="card">
+      <h3>Folk (folk.app)</h3>
+      <span class="tag tag-purple">Web</span>
+      <span class="tag tag-teal">类Notion UI</span>
+      <p style="margin-top:8px;">轻量CRM，类似Notion的灵活界面。支持联系人管道管理、邮件序列。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 面向团队销售、无个人关系深度管理</p>
+    </div>
+    <div class="card">
+      <h3>UpHabit</h3>
+      <span class="tag tag-teal">iOS/Android</span>
+      <span class="tag tag-yellow">免费+付费</span>
+      <p style="margin-top:8px;">纯移动端关系管理。联系提醒、分组、互动记录。UI简洁，适合轻度用户。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 无AI、无战略规划、功能较浅</p>
+    </div>
+    <div class="card">
+      <h3>Notion + 模板</h3>
+      <span class="tag tag-purple">Web+Mobile</span>
+      <span class="tag tag-green">DIY</span>
+      <p style="margin-top:8px;">很多用户用Notion数据库做个人CRM。灵活但需要自己搭建，无自动化。</p>
+      <p style="margin-top:6px;"><strong>缺失:</strong> 纯手动、无提醒、无AI、配置门槛高</p>
+    </div>
+  </div>
+
+  <h3 style="margin: 24px 0 16px; color: var(--accent2);">AI驱动 / 创新工具</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Claudia (GitHub开源)</h3>
+      <span class="tag tag-green">开源</span>
+      <span class="tag tag-pink">AI原生</span>
+      <span class="tag tag-yellow">终端CLI</span>
+      <p style="margin-top:8px;">基于Claude Code的终端AI助手。核心亮点: 关系健康度追踪、承诺追踪、模式识别、关系冷却预警。数据存储在Obsidian Vault中。197 GitHub Stars。</p>
+      <p style="margin-top:6px;"><strong>启发:</strong> AI原生+本地隐私优先是正确方向</p>
+    </div>
+    <div class="card">
+      <h3>PingCRM (GitHub开源)</h3>
+      <span class="tag tag-green">开源</span>
+      <span class="tag tag-pink">AI评分</span>
+      <span class="tag tag-teal">多平台集成</span>
+      <p style="margin-top:8px;">AI驱动的开源个人CRM。关系评分(0-10)、Gmail/Telegram/Twitter同步、生命事件检测(职位变动/生日等)、Claude AI生成跟进建议。Python FastAPI + React。</p>
+      <p style="margin-top:6px;"><strong>启发:</strong> 关系评分+事件检测+AI建议的组合很有价值</p>
+    </div>
+    <div class="card">
+      <h3>Limitless AI (已被Meta收购)</h3>
+      <span class="tag tag-red">已停运</span>
+      <span class="tag tag-pink">可穿戴</span>
+      <p style="margin-top:8px;">AI可穿戴设备(Pendant)，自动录音、转录对话。虽非CRM，但代表了"自动记录人际互动"的方向。</p>
+      <p style="margin-top:6px;"><strong>启发:</strong> 自动化互动记录是未来趋势</p>
+    </div>
+    <div class="card">
+      <h3>grw (GitHub 842 Stars)</h3>
+      <span class="tag tag-green">开源</span>
+      <span class="tag tag-red">已停维护</span>
+      <p style="margin-top:8px;">中文个人事务管理系统。JavaScript开发，包含个人网络管理功能。虽已停止维护，但说明中文市场有需求。</p>
+      <p style="margin-top:6px;"><strong>启发:</strong> 中文市场缺乏持续维护的个人关系管理工具</p>
+    </div>
+  </div>
+
+  <h3 style="margin: 24px 0 16px; color: var(--accent3);">中国市场现状</h3>
+  <div class="card">
+    <p>中国市场目前<strong>没有</strong>专门的、成熟的个人关系管理App。现有替代方案:</p>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;">
+      <div>
+        <strong>微信生态</strong>
+        <p>标签分组、备注功能，但无提醒、无AI、无关系评分。是最大的社交入口但非管理工具。</p>
+      </div>
+      <div>
+        <strong>钉钉/飞书</strong>
+        <p>企业CRM导向，不适合个人使用。钉钉多维表格可以做简单通讯录但无智能功能。</p>
+      </div>
+      <div>
+        <strong>脉脉</strong>
+        <p>偏职业社交网络，不是个人关系管理工具。数据归平台所有。</p>
+      </div>
+      <div>
+        <strong>Notion/飞书多维表格 DIY</strong>
+        <p>极客用户自建方案。门槛高、无自动化、需要持续维护。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. GAP ANALYSIS -->
+<div class="section" id="gap">
+  <h2 class="section-title"><span class="num">2</span> 市场空白与机会</h2>
+  <p class="section-desc">现有产品对比分析，识别未被满足的需求。</p>
+
+  <div style="overflow-x: auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>能力维度</th>
+        <th>Dex</th>
+        <th>Monica</th>
+        <th>Clay</th>
+        <th>Claudia</th>
+        <th>PingCRM</th>
+        <th style="color:var(--green)">你的PRM</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>联系人管理</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+      </tr>
+      <tr>
+        <td>圈层管理(同心圆)</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--orange)">基础标签</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--green)">核心功能</td>
+      </tr>
+      <tr>
+        <td>关系健康度评分</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--orange)">基础</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有(0-10)</td>
+        <td style="color:var(--green)">多维(0-100)</td>
+      </tr>
+      <tr>
+        <td>AI沟通建议</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--orange)">基础</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--green)">情境化+个性化</td>
+      </tr>
+      <tr>
+        <td>战略标记(加密/保持/淡出)</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--green)">独创功能</td>
+      </tr>
+      <tr>
+        <td>个人SWOT匹配</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--green)">独创功能</td>
+      </tr>
+      <tr>
+        <td>隐私分级加密</td>
+        <td style="color:var(--orange)">基础</td>
+        <td style="color:var(--orange)">自托管</td>
+        <td style="color:var(--red)">云端</td>
+        <td style="color:var(--green)">本地</td>
+        <td style="color:var(--orange)">自托管</td>
+        <td style="color:var(--green)">三层加密+本地AI</td>
+      </tr>
+      <tr>
+        <td>自动化引擎</td>
+        <td style="color:var(--orange)">提醒</td>
+        <td style="color:var(--red)">无</td>
+        <td style="color:var(--green)">有</td>
+        <td style="color:var(--orange)">提醒</td>
+        <td style="color:var(--orange)">基础</td>
+        <td style="color:var(--green)">规则引擎+AI</td>
+      </tr>
+      <tr>
+        <td>中文优化</td>
+        <td style="color:var(--red)">英文</td>
+        <td style="color:var(--orange)">部分</td>
+        <td style="color:var(--red)">英文</td>
+        <td style="color:var(--red)">英文</td>
+        <td style="color:var(--red)">英文</td>
+        <td style="color:var(--green)">中文原生</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="highlight-box">
+    <h3>核心结论: 三个独创差异化功能</h3>
+    <div class="grid-3" style="margin-top:12px;">
+      <div>
+        <strong style="color:var(--accent)">1. 战略标记引擎</strong>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">全球没有任何产品支持"加密/保持/淡出"的关系战略管理。这是从被动记录到主动设计的范式转变。</p>
+      </div>
+      <div>
+        <strong style="color:var(--accent2)">2. SWOT匹配</strong>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">将个人优劣势与人脉资源对齐。回答"我的人际环境是否支撑我的战略目标"。</p>
+      </div>
+      <div>
+        <strong style="color:var(--accent3)">3. 三层隐私架构</strong>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">公开层/私密层/核心层，敏感判断(如"此人不可信")仅设备本地加密存储。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. PRODUCT CONCEPT -->
+<div class="section" id="concept">
+  <h2 class="section-title"><span class="num">3</span> 产品核心概念: "环境设计"</h2>
+  <p class="section-desc">不是"更好地管理关系"，而是"主动设计你的人际环境"。</p>
+
+  <div class="grid-3">
+    <div class="card strategy-card">
+      <div class="big-icon" style="color:var(--accent);">&#9650;</div>
+      <h3 style="color:var(--green)">加密 (Strengthen)</h3>
+      <p>主动投资的高价值关系。系统生成30/60/90天深化计划，优先推送AI建议。</p>
+    </div>
+    <div class="card strategy-card">
+      <div class="big-icon" style="color:var(--accent2);">&#9644;</div>
+      <h3 style="color:var(--accent4)">保持 (Maintain)</h3>
+      <p>维持当前关系温度。按设定频率提醒，保持现有互动深度，不特别加力。</p>
+    </div>
+    <div class="card strategy-card">
+      <div class="big-icon" style="color:var(--text-dim);">&#9660;</div>
+      <h3 style="color:var(--text-dim)">淡出 (Phase Out)</h3>
+      <p>有尊严地降低互动密度。停止主动提醒，建议最后一次礼貌互动话题，归档保留。</p>
+    </div>
+  </div>
+
+  <h3 style="margin: 32px 0 16px;">圈层模型 -- 同心圆结构</h3>
+  <div class="circle-diagram">
+    <div class="circle-ring ring-outer">
+      <span class="ring-label" style="top:10px; left:50%; transform:translateX(-50%); color:var(--accent4);">泛熟人/弱连接 (不限人数, 每季联系)</span>
+    </div>
+    <div class="circle-ring ring-mid">
+      <span class="ring-label" style="top:10px; left:50%; transform:translateX(-50%); color:var(--accent2);">朋友/业务伙伴 (50人, 每月联系)</span>
+    </div>
+    <div class="circle-ring ring-inner">
+      <span class="ring-label" style="color:var(--accent); font-size:0.7rem; text-align:center; line-height:1.3;">核心圈<br>5人<br>每周</span>
+    </div>
+  </div>
+
+  <h3 style="margin: 32px 0 16px;">关系健康度评分模型 (0-100)</h3>
+  <div class="card">
+    <div class="score-bar">
+      <span class="score-label">互动频率分</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:35%; background:var(--accent);"></div></div>
+      <span class="score-value">35%</span>
+    </div>
+    <div class="score-bar">
+      <span class="score-label">互动互惠分</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:25%; background:var(--accent2);"></div></div>
+      <span class="score-value">25%</span>
+    </div>
+    <div class="score-bar">
+      <span class="score-label">情感质量分</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:25%; background:var(--accent3);"></div></div>
+      <span class="score-value">25%</span>
+    </div>
+    <div class="score-bar">
+      <span class="score-label">目标对齐分</span>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:15%; background:var(--accent4);"></div></div>
+      <span class="score-value">15%</span>
+    </div>
+    <p style="margin-top:12px; font-size:0.85rem; color:var(--text-dim);">
+      附加机制: 6个月前的互动权重衰减至25% | 30天趋势指示器(上升/稳定/下降) | 圈层基准对比
+    </p>
+  </div>
+</div>
+
+<!-- 4. ARCHITECTURE -->
+<div class="section" id="arch">
+  <h2 class="section-title"><span class="num">4</span> 技术架构设计</h2>
+  <p class="section-desc">隐私优先、本地优先、可选云端同步的架构。</p>
+
+  <div class="arch-layer" style="border-color: var(--accent3);">
+    <h4><span style="color:var(--accent3)">&#9632;</span> 客户端层</h4>
+    <div class="arch-boxes">
+      <div class="arch-box">React Native<small>iOS + Android</small></div>
+      <div class="arch-box">Next.js 14<small>Web Dashboard</small></div>
+      <div class="arch-box">Zustand<small>状态管理</small></div>
+      <div class="arch-box">React Query<small>服务端状态</small></div>
+    </div>
+  </div>
+
+  <div class="arch-layer" style="border-color: var(--accent);">
+    <h4><span style="color:var(--accent)">&#9632;</span> 本地层 (隐私优先)</h4>
+    <div class="arch-boxes">
+      <div class="arch-box">SQLite + SQLCipher<small>本地加密数据库</small></div>
+      <div class="arch-box">Phi-3-mini / llama.cpp<small>设备端AI推理</small></div>
+      <div class="arch-box">CRDT (Yjs)<small>无冲突离线同步</small></div>
+      <div class="arch-box">AES-256-GCM<small>端到端加密</small></div>
+    </div>
+  </div>
+
+  <div class="arch-layer" style="border-color: var(--accent2);">
+    <h4><span style="color:var(--accent2)">&#9632;</span> 云端层 (可选同步)</h4>
+    <div class="arch-boxes">
+      <div class="arch-box">FastAPI (Python)<small>后端框架</small></div>
+      <div class="arch-box">PostgreSQL + pgvector<small>向量搜索</small></div>
+      <div class="arch-box">Redis + Celery<small>任务队列</small></div>
+      <div class="arch-box">Claude / OpenAI API<small>云端AI</small></div>
+    </div>
+  </div>
+
+  <div class="arch-layer" style="border-color: var(--accent4);">
+    <h4><span style="color:var(--accent4)">&#9632;</span> AI层</h4>
+    <div class="arch-boxes">
+      <div class="arch-box">LLM路由器<small>本地/云端自动切换</small></div>
+      <div class="arch-box">NLP管道<small>情感分析+话题提取</small></div>
+      <div class="arch-box">评分引擎<small>关系健康度计算</small></div>
+      <div class="arch-box">推荐引擎<small>行动建议生成</small></div>
+    </div>
+  </div>
+
+  <h3 style="margin: 32px 0 16px;">技术栈选型</h3>
+  <table>
+    <thead>
+      <tr><th>层级</th><th>技术选型</th><th>选择理由</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>移动端</td><td>React Native + Expo</td><td>跨平台，JS生态，快速迭代</td></tr>
+      <tr><td>Web端</td><td>Next.js 14 (App Router)</td><td>SSR/SSG，与RN共享逻辑</td></tr>
+      <tr><td>本地数据库</td><td>SQLite + SQLCipher</td><td>离线优先，零配置，隐私保障</td></tr>
+      <tr><td>云端数据库</td><td>PostgreSQL + pgvector</td><td>向量搜索支持AI语义查询</td></tr>
+      <tr><td>后端框架</td><td>FastAPI (Python)</td><td>异步高性能，AI生态最佳</td></tr>
+      <tr><td>本地AI</td><td>Phi-3-mini / llama.cpp</td><td>设备端推理，隐私保护</td></tr>
+      <tr><td>云端AI</td><td>Claude API</td><td>复杂推理，高质量建议</td></tr>
+      <tr><td>同步协议</td><td>CRDT (Yjs)</td><td>无冲突离线同步</td></tr>
+      <tr><td>加密</td><td>AES-256-GCM + E2EE</td><td>端到端加密，零知识架构</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 5. DATA MODEL -->
+<div class="section" id="datamodel">
+  <h2 class="section-title"><span class="num">5</span> 数据模型</h2>
+  <p class="section-desc">核心数据表设计，支持圈层管理、关系评分和AI分析。</p>
+
+  <div class="flow-diagram">
+    <div class="flow-box" style="border-color:var(--accent);">
+      <div class="label">User</div>
+      <div class="desc">用户主表</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--accent2);">
+      <div class="label">Contact</div>
+      <div class="desc">联系人(加密存储)</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--accent3);">
+      <div class="label">Circle</div>
+      <div class="desc">圈子(多对多)</div>
+    </div>
+  </div>
+  <div class="flow-diagram">
+    <div class="flow-box" style="border-color:var(--accent4);">
+      <div class="label">Interaction</div>
+      <div class="desc">互动记录</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--green);">
+      <div class="label">Score</div>
+      <div class="desc">关系健康度</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--accent);">
+      <div class="label">ActionItem</div>
+      <div class="desc">AI行动建议</div>
+    </div>
+  </div>
+  <div class="flow-diagram">
+    <div class="flow-box" style="border-color:var(--accent3);">
+      <div class="label">Profile</div>
+      <div class="desc">个人画像+SWOT</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--accent4);">
+      <div class="label">CircleRule</div>
+      <div class="desc">自动化规则</div>
+    </div>
+    <div class="flow-arrow">&#8594;</div>
+    <div class="flow-box" style="border-color:var(--accent2);">
+      <div class="label">UserTrait</div>
+      <div class="desc">优势/劣势标签</div>
+    </div>
+  </div>
+
+  <h3 style="margin: 24px 0 12px;">关键数据表</h3>
+  <table>
+    <thead><tr><th>表名</th><th>核心字段</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>contacts</td><td>name, relationship_status, phone_encrypted, embedding</td><td>联系人主表，敏感字段AES加密，含向量嵌入用于语义搜索</td></tr>
+      <tr><td>circles</td><td>name, color, contact_frequency_days, priority_level</td><td>圈层定义，每圈独立频率和优先级配置</td></tr>
+      <tr><td>circle_memberships</td><td>circle_id, contact_id, custom_frequency_days</td><td>多对多关系，支持覆盖圈层默认频率</td></tr>
+      <tr><td>interactions</td><td>type, channel, sentiment_score, topics[], initiated_by</td><td>互动记录，含AI情感分析和话题提取</td></tr>
+      <tr><td>relationship_scores</td><td>overall_score, frequency/reciprocity/depth/recency_score</td><td>多维健康度评分，含趋势和衰减预测</td></tr>
+      <tr><td>action_items</td><td>action_type, suggested_message, ai_reasoning, status</td><td>AI生成的行动建议，含推理理由</td></tr>
+      <tr><td>personal_profiles</td><td>personality_type, communication_style, goals</td><td>用户画像，驱动AI个性化建议</td></tr>
+      <tr><td>user_traits</td><td>trait_type(strength/weakness), category, description</td><td>SWOT条目，用于匹配联系人能力</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 6. FEATURES -->
+<div class="section" id="features">
+  <h2 class="section-title"><span class="num">6</span> 功能规划与优先级</h2>
+  <p class="section-desc">分三期开发，MVP在2个月内可交付。</p>
+
+  <div style="margin-bottom: 8px;">
+    <div class="priority-matrix">
+      <div class="priority-label p0-label">P0 MVP<br>第1-2月</div>
+      <div class="priority-items p0-items">
+        <ul>
+          <li>联系人管理 -- 录入/编辑/搜索/导入(通讯录/CSV)</li>
+          <li>圈层管理(基础版) -- 创建圈层、分配联系人、设定联系频率</li>
+          <li>互动记录(手动) -- 记录对话/见面/通话，打标签</li>
+          <li>关系健康度(静态版) -- 基于最后联系时间的简单评分</li>
+          <li>提醒系统(基础版) -- 生日提醒、联系频率到期提醒</li>
+          <li>个人资料中心 -- 用户自身SWOT输入、目标设定</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="margin-bottom: 8px;">
+    <div class="priority-matrix">
+      <div class="priority-label p1-label">P1 差异化<br>第3-4月</div>
+      <div class="priority-items p1-items">
+        <ul>
+          <li>AI沟通建议 -- 基于上下文生成对话起点、话题推荐、3种语气备选</li>
+          <li>关系健康度(多维版) -- 频率/互惠/情感/目标四维评分 + 趋势分析</li>
+          <li>策略引擎 -- 加密/保持/淡出标记 + 30/60/90天行动计划</li>
+          <li>SWOT匹配引擎 -- 联系人能力与用户需求的智能匹配</li>
+          <li>隐私分级 -- 三层加密(公开/私密/核心)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div style="margin-bottom: 8px;">
+    <div class="priority-matrix">
+      <div class="priority-label p2-label">P2 进阶<br>第5-6月</div>
+      <div class="priority-items p2-items">
+        <ul>
+          <li>全自动化引擎 -- If-Then-But规则构建、自动起草消息、邮件发送</li>
+          <li>社交媒体集成 -- 微信(企业微信API)、LinkedIn动态监控</li>
+          <li>高级分析仪表板 -- 网络图谱可视化、引荐路径推荐、资源缺口分析</li>
+          <li>群体动态分析 -- 识别关系集群</li>
+          <li>日历/邮件/CRM系统整合</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin: 32px 0 16px;">AI沟通建议示例</h3>
+  <div class="code-block">
+<span style="color:#8b949e">联系人: 张明 (战略圈, 产品方向)</span>
+<span style="color:#8b949e">上次联系: 47天前, 话题: 新产品讨论</span>
+<span style="color:#8b949e">触发原因: 关系健康度下降至52分</span>
+
+<span style="color:#79c0ff">建议 A (轻松):</span>
+"张总，上次聊到你们新品发布，最近推进得怎么样了？
+我这边刚看完一篇关于B端SaaS定价策略的报告，
+感觉跟你们场景很像，要不要发给你？"
+
+<span style="color:#79c0ff">建议 B (专业):</span>
+"张明，距我们上次深聊已近两个月。最近我在关注
+[行业趋势]，想到与你此前提到的战略方向高度相关，
+希望找个时间交流15分钟，同步一下各自的最新判断。"
+  </div>
+</div>
+
+<!-- 7. ROADMAP -->
+<div class="section" id="roadmap">
+  <h2 class="section-title"><span class="num">7</span> 开发路线图</h2>
+  <p class="section-desc">12个Sprint (每Sprint 2周)，6个月完成v1.0。</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot dot-green"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--green)">Sprint 1-2 | 数据基础 + 互动记录 (Month 1)</h4>
+        <p>联系人CRUD、圈层创建、SQLite数据库、互动记录、基础提醒、导航框架</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot dot-green"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--green)">Sprint 3-4 | MVP打磨 + 内测 (Month 2)</h4>
+        <p>关系评分(静态版)、SWOT输入、通讯录导入、同心圆可视化、TestFlight发布内测</p>
+        <p style="color:var(--accent4); margin-top:4px;">决策点: 内测反馈收集，确认P1优先级</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot dot-purple"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent)">Sprint 5-6 | AI建议 + 多维评分 (Month 3)</h4>
+        <p>多维关系评分(四维+趋势)、Claude API集成、上下文拼装、建议卡片UI、用户反馈学习</p>
+        <p style="color:var(--accent4); margin-top:4px;">决策点: 评估本地LLM替代方案</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot dot-purple"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent)">Sprint 7-8 | 策略引擎 + 隐私分级 (Month 4)</h4>
+        <p>加密/保持/淡出标记、行动计划生成、SWOT匹配、SQLCipher加密、三层隐私UI、App Store准备</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot dot-yellow"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent4)">Sprint 9-10 | 自动化 + 社交集成 (Month 5)</h4>
+        <p>If-Then-But规则引擎、消息草稿自动化、邮件集成、微信半自动化方案评估</p>
+        <p style="color:var(--accent4); margin-top:4px;">决策点: 微信集成技术方案最终确认</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot dot-yellow"></div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent4)">Sprint 11-12 | 高级分析 + v1.0发布 (Month 6)</h4>
+        <p>网络图谱可视化、引荐路径推荐、资源缺口分析、性能优化、v1.0正式发布</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. MONETIZATION -->
+<div class="section" id="monetize">
+  <h2 class="section-title"><span class="num">8</span> 商业化策略</h2>
+  <p class="section-desc">Freemium模式，核心价值免费体验，AI和高级功能付费。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>功能</th>
+        <th>免费版</th>
+        <th>标准版 38元/月</th>
+        <th>专业版 88元/月</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>联系人数量</td><td>50人</td><td>无限</td><td>无限</td></tr>
+      <tr><td>圈层数量</td><td>3个</td><td>无限</td><td>无限</td></tr>
+      <tr><td>互动记录</td><td>近3个月</td><td>完整历史</td><td>完整历史</td></tr>
+      <tr><td>关系健康度</td><td>基础(频率)</td><td>多维评分</td><td>多维+趋势分析</td></tr>
+      <tr><td>AI沟通建议</td><td>每月5次</td><td>每月50次</td><td style="color:var(--green)">无限(含本地模式)</td></tr>
+      <tr><td>策略引擎</td><td style="color:var(--red)">--</td><td style="color:var(--green)">可用</td><td style="color:var(--green)">可用</td></tr>
+      <tr><td>SWOT匹配</td><td style="color:var(--red)">--</td><td style="color:var(--green)">可用</td><td style="color:var(--green)">高级+缺口报告</td></tr>
+      <tr><td>自动化规则</td><td style="color:var(--red)">--</td><td>5条</td><td style="color:var(--green)">无限</td></tr>
+      <tr><td>隐私本地AI</td><td style="color:var(--red)">--</td><td style="color:var(--red)">--</td><td style="color:var(--green)">可用</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid-3" style="margin-top:32px;">
+    <div class="card summary-stat">
+      <div class="num">5,000</div>
+      <div class="label">第6个月目标活跃用户</div>
+    </div>
+    <div class="card summary-stat">
+      <div class="num">8%</div>
+      <div class="label">预估付费转化率</div>
+    </div>
+    <div class="card summary-stat">
+      <div class="num">21,200</div>
+      <div class="label">第6个月预估月收入(元)</div>
+    </div>
+  </div>
+
+  <h3 style="margin: 32px 0 16px;">目标用户画像</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>创业者/企业主</h3>
+      <p>关系是核心生产资料。需要系统化管理商业人脉，不遗漏关键联系。你本人就是典型用户。</p>
+    </div>
+    <div class="card">
+      <h3>职场中高层/销售</h3>
+      <p>晋升路径上的关键关系管理。需要维护客户、上级、同行的复杂网络。</p>
+    </div>
+    <div class="card">
+      <h3>自由职业者/顾问</h3>
+      <p>口碑和转介绍是生命线。需要持续培育人脉网络，不能让关系冷掉。</p>
+    </div>
+    <div class="card">
+      <h3>个人成长爱好者</h3>
+      <p>对自我优化方法论高度认可。愿意投入时间主动设计人际环境。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 9. ACTION -->
+<div class="section" id="action">
+  <h2 class="section-title"><span class="num">9</span> 下一步行动建议</h2>
+  <p class="section-desc">具体可执行的下一步。</p>
+
+  <div class="highlight-box">
+    <h3 style="color:var(--green)">建议1: 先用MVP验证核心假设 (2周)</h3>
+    <p style="margin-top:8px;">不急着写App，先用Notion/飞书多维表格搭一个简化版，自己用2周。验证:</p>
+    <p style="margin-top:4px;">- 圈层分类对你实际有帮助吗？分几层合适？</p>
+    <p>- 关系评分公式是否合理？</p>
+    <p>- 你真的会看AI建议并行动吗？</p>
+  </div>
+
+  <div class="highlight-box" style="border-color: var(--accent2);">
+    <h3 style="color:var(--accent2)">建议2: 技术选型二选一</h3>
+    <div class="grid-2" style="margin-top:12px;">
+      <div>
+        <strong>方案A: 轻量Web App优先</strong>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">Next.js全栈 + Supabase + PWA。2-3周出MVP，验证后再做Native。适合快速验证。</p>
+      </div>
+      <div>
+        <strong>方案B: React Native原生优先</strong>
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">React Native + SQLite本地。体验更好，但开发周期长。适合确定要做产品。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="border-color: var(--accent4);">
+    <h3 style="color:var(--accent4)">建议3: 借鉴而非重造轮子</h3>
+    <p style="margin-top:8px;">参考开源项目起步:</p>
+    <p style="margin-top:4px;">- <strong>PingCRM</strong>的关系评分+AI建议架构可以直接借鉴(Python FastAPI + React)</p>
+    <p>- <strong>Claudia</strong>的记忆系统和关系追踪模式值得研究</p>
+    <p>- <strong>Monica</strong>的数据模型设计最成熟(21k GitHub Stars)</p>
+  </div>
+
+  <div class="highlight-box" style="border-color: var(--accent3);">
+    <h3 style="color:var(--accent3)">建议4: 个人先用再考虑产品化</h3>
+    <p style="margin-top:8px;">基于你的实际需求，建议先做一个"个人工具"而非"产品":</p>
+    <p style="margin-top:4px;">1. 先把自己的50-100个关键联系人录入并分圈</p>
+    <p>2. 跑2-3个月，积累互动数据，验证评分模型</p>
+    <p>3. 确认核心流程后再考虑产品化和商业化</p>
+    <p>4. 这样做的好处: 你就是第一个重度用户，产品方向不会偏</p>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>个人资源管理App调研报告 | 2026-04-05 | Personal Health Agent for Gene&I Scientific</p>
+  <p style="margin-top:8px;">市场调研 + 技术架构 + 功能规划 = 3个AI Agent并行研究完成</p>
+</div>
+
+</body>
+</html>
