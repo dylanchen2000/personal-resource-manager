@@ -57,7 +57,7 @@ export default function App() {
     <>
       <nav className="sidebar">
         <div className="sidebar-brand">
-          <h1>PRM</h1>
+          <h1>友人记</h1>
           <p>人脉资源管理</p>
         </div>
         <div className="sidebar-nav">
