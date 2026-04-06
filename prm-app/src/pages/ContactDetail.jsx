@@ -261,8 +261,20 @@ export default function ContactDetail({ contactId, onBack, onRefresh }) {
               </div>
             </div>
             <div className="form-group">
+              <label>认识经过</label>
+              <textarea value={form.howWeMet || ''} onChange={e => setForm({ ...form, howWeMet: e.target.value })} rows={2} placeholder="在哪里认识的？谁介绍的？" />
+            </div>
+            <div className="form-group">
               <label>关心细节（孩子、宠物、爱好、偏好等）</label>
               <textarea value={form.details || ''} onChange={e => setForm({ ...form, details: e.target.value })} rows={2} placeholder="如：儿子叫小明，养了一只金毛叫Lucky..." />
+            </div>
+            <div className="form-group">
+              <label>家庭信息</label>
+              <textarea value={form.familyInfo || ''} onChange={e => setForm({ ...form, familyInfo: e.target.value })} rows={2} placeholder="配偶、子女、父母等" />
+            </div>
+            <div className="form-group">
+              <label>礼物想法</label>
+              <textarea value={form.giftIdeas || ''} onChange={e => setForm({ ...form, giftIdeas: e.target.value })} rows={2} placeholder="送礼灵感" />
             </div>
             <div className="form-group"><label>备注</label><textarea value={form.notes || ''} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} /></div>
             <div className="form-group"><label>私密备注（仅本地可见）</label><textarea value={form.privateNotes || ''} onChange={e => setForm({ ...form, privateNotes: e.target.value })} rows={2} /></div>
@@ -291,9 +303,20 @@ export default function ContactDetail({ contactId, onBack, onRefresh }) {
               {contact.strategy ? <span className={`badge badge-${contact.strategy === '加密' ? 'strengthen' : contact.strategy === '保持' ? 'maintain' : 'fadeout'}`} style={{ marginLeft: 4 }}>{contact.strategy}</span> : '未定'}
             </div>
             <div><span style={{ color: 'var(--text-dim)' }}>最后联系：</span>{contact.lastContact ? timeAgo(contact.lastContact) : '从未'}</div>
+            {contact.howWeMet && (
+              <div style={{ gridColumn: '1/-1' }}><span style={{ color: 'var(--text-dim)' }}>认识经过：</span>{contact.howWeMet}</div>
+            )}
             {contact.details && (
               <div style={{ gridColumn: '1/-1', padding: '8px 12px', background: 'rgba(59,130,246,0.08)', borderRadius: 8, border: '1px solid rgba(59,130,246,0.2)' }}>
                 <span style={{ color: 'var(--accent)', fontSize: 12 }}>关心细节：</span><span style={{ fontSize: 13 }}>{contact.details}</span>
+              </div>
+            )}
+            {contact.familyInfo && (
+              <div style={{ gridColumn: '1/-1' }}><span style={{ color: 'var(--text-dim)' }}>家庭信息：</span>{contact.familyInfo}</div>
+            )}
+            {contact.giftIdeas && (
+              <div style={{ gridColumn: '1/-1', padding: '8px 12px', background: 'rgba(236,72,153,0.08)', borderRadius: 8, border: '1px solid rgba(236,72,153,0.2)' }}>
+                <span style={{ color: 'var(--pink)', fontSize: 12 }}>礼物想法：</span><span style={{ fontSize: 13 }}>{contact.giftIdeas}</span>
               </div>
             )}
             {contact.notes && <div style={{ gridColumn: '1/-1' }}><span style={{ color: 'var(--text-dim)' }}>备注：</span>{contact.notes}</div>}

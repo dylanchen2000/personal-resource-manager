@@ -18,6 +18,10 @@ const DEFAULT_CIRCLES = [
   { id: 'c_hobby', name: '同好圈', color: '#8b5cf6', icon: '🎯', desc: '共同爱好者' },
   { id: 'c_biz', name: '商业圈', color: '#6366f1', icon: '💼', desc: '商业合作伙伴' },
   { id: 'c_family', name: '家人亲友', color: '#ec4899', icon: '❤️', desc: '家人和亲戚' },
+  { id: 'c_mentor', name: '良师益友', color: '#14b8a6', icon: '🌟', desc: '人生导师和益友' },
+  { id: 'c_core', name: '核心朋友', color: '#f43f5e', icon: '💎', desc: '最亲密的核心好友' },
+  { id: 'c_resource', name: '资源圈', color: '#a855f7', icon: '🔗', desc: '资源互换合作' },
+  { id: 'c_edu', name: '孩子教育', color: '#0ea5e9', icon: '📚', desc: '子女教育相关' },
 ]
 
 // 人情分类
@@ -78,8 +82,15 @@ export async function getCircles() {
     }
     return [...DEFAULT_CIRCLES]
   }
+  // 补充新增的默认圈子（用户已有数据时也能看到新圈子）
+  for (const dc of DEFAULT_CIRCLES) {
+    if (!keys.includes(dc.id)) {
+      await circlesDB.setItem(dc.id, dc)
+    }
+  }
   const circles = []
-  for (const key of keys) {
+  const allKeys = await circlesDB.keys()
+  for (const key of allKeys) {
     circles.push(await circlesDB.getItem(key))
   }
   return circles.sort((a, b) => (a.name > b.name ? 1 : -1))

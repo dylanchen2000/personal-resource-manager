@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Users } from 'lucide-react'
+import { Plus, Search, Users, Sparkles } from 'lucide-react'
 import { getContacts, getCircles, saveContact, deleteContact, FAVOR_TYPES, STRATEGY_TYPES, REMINDER_FREQUENCIES, getHealthColor, getContactDueInfo } from '../utils/store'
 import { nameColor, nameInitial, timeAgo } from '../utils/helpers'
 
@@ -63,7 +63,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
   }
 
   function openAdd() {
-    setForm({ name: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '', reminderFreq: null, birthday: '', details: '' })
+    setForm({ name: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '', reminderFreq: null, birthday: '', details: '', howWeMet: '', giftIdeas: '', familyInfo: '' })
     setShowModal(true)
   }
 
@@ -149,6 +149,11 @@ export default function Contacts({ onOpenContact, onRefresh }) {
                   <div>{c.lastContact ? timeAgo(c.lastContact) : '从未联系'}</div>
                   {c.reminderFreq && <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>{c.reminderFreq}</div>}
                 </div>
+                <button className="btn btn-sm" onClick={(e) => { e.stopPropagation(); onOpenContact(c.id) }}
+                  style={{ flexShrink: 0, fontSize: 11, color: 'var(--accent)', border: '1px solid rgba(99,102,241,0.3)', background: 'rgba(99,102,241,0.08)' }}
+                  title="点击查看AI关系诊断和消息草稿">
+                  <Sparkles size={12} /> AI
+                </button>
               </div>
             )
           })}
@@ -263,8 +268,23 @@ export default function Contacts({ onOpenContact, onRefresh }) {
             </div>
 
             <div className="form-group">
+              <label>认识经过</label>
+              <textarea value={form.howWeMet || ''} onChange={e => setForm({ ...form, howWeMet: e.target.value })} placeholder="在哪里认识的？谁介绍的？" rows={2} />
+            </div>
+
+            <div className="form-group">
               <label>关心细节（孩子、宠物、爱好、偏好等）</label>
               <textarea value={form.details || ''} onChange={e => setForm({ ...form, details: e.target.value })} placeholder="如：儿子叫小明，养了一只金毛叫Lucky，喜欢跑步..." rows={2} />
+            </div>
+
+            <div className="form-group">
+              <label>家庭信息</label>
+              <textarea value={form.familyInfo || ''} onChange={e => setForm({ ...form, familyInfo: e.target.value })} placeholder="配偶、子女、父母等家庭信息..." rows={2} />
+            </div>
+
+            <div className="form-group">
+              <label>礼物想法</label>
+              <textarea value={form.giftIdeas || ''} onChange={e => setForm({ ...form, giftIdeas: e.target.value })} placeholder="送礼灵感：他/她喜欢什么？忌讳什么？" rows={2} />
             </div>
 
             <div className="form-group">
