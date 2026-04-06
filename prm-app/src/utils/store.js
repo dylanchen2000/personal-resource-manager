@@ -122,6 +122,10 @@ export async function saveContact(contact) {
   if (!contact.id) {
     contact.id = 'p_' + genId()
     contact.createdAt = now
+    // 新联系人：录入即视为"刚联系过"，避免一上来就显示999天未联系
+    if (!contact.lastContact) {
+      contact.lastContact = now
+    }
   }
   contact.updatedAt = now
   await contactsDB.setItem(contact.id, contact)

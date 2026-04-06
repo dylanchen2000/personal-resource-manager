@@ -199,16 +199,26 @@ function ruleBasedContactAdvice(contact, interactions, favorRecords) {
   const warnings = [];
   const topicSuggestions = [];
 
+  // 判断是否刚录入（7天内创建）
+  const isNewlyAdded = contact.createdAt && (Date.now() - contact.createdAt < 7 * 86400000);
+
   // 健康分计算
   let score = 100;
-  const overdue = days - expectedDays;
-  if (overdue > 0) score -= Math.min(40, Math.floor(overdue / 10) * 5);
-  if (Math.abs(balance) > 3) score -= 15;
-  if (contact.strategy === '淡出') score -= 10;
+  if (isNewlyAdded) {
+    // 新联系人：给满分，体验友好
+    score = 100;
+  } else {
+    const overdue = days - expectedDays;
+    if (overdue > 0) score -= Math.min(40, Math.floor(overdue / 10) * 5);
+    if (Math.abs(balance) > 3) score -= 15;
+    if (contact.strategy === '淡出') score -= 10;
+  }
 
-  // 预警
-  if (days > 180) warnings.push(`已${days}天未联系，关系可能已疏远`);
-  else if (days > expectedDays) warnings.push(`超过预期联系周期${overdue}天，建议尽快联系`);
+  // 预警（新联系人不显示过期警告）
+  if (!isNewlyAdded) {
+    if (days > 180) warnings.push(`已${days}天未联系，关系可能已疏远`);
+    else if (days > expectedDays) warnings.push(`超过预期联系周期${days - expectedDays}天，建议尽快联系`);
+  }
   if (balance > 3) warnings.push('人情余额较高，对方可能感到压力，适时回馈');
   if (balance < -3) warnings.push('人情欠账较多，注意维护关系，及时回馈');
 
@@ -219,16 +229,29 @@ function ruleBasedContactAdvice(contact, interactions, favorRecords) {
   const festival = getNextFestival();
   if (festival.daysAway <= 14) topicSuggestions.push(`借${festival.name}节点问候`);
   else topicSuggestions.push('分享一条对方可能感兴趣的行业资讯');
+  if (isNewlyAdded) {
+    topicSuggestions.unshift('完善资料：补充认识经过、关心细节、家庭信息');
+  }
 
   // 关系摘要
   const layerLabel = { inner: '亲密关系', middle: '有效社交', outer: '泛泛之交' }[layer];
-  const summary = `${layerLabel} · 人情${balance > 0 ? '余额正向' : balance < 0 ? '有所亏欠' : '基本平衡'} · ${days > expectedDays ? '联系偏少' : '保持良好'}`;
+  if (isNewlyAdded) {
+    var summary = `刚录入 · ${layerLabel} · 建议完善资料后开始维护`;
+  } else {
+    var summary = `${layerLabel} · 人情${balance > 0 ? '余额正向' : balance < 0 ? '有所亏欠' : '基本平衡'} · ${days > expectedDays ? '联系偏少' : '保持良好'}`;
+  }
 
   // 下一步行动
   let nextAction = '';
-  if (days > 90) nextAction = `发一条热身消息（如"最近怎样"），重建联系`;
-  else if (days > expectedDays) nextAction = `通过${channel}发送一条轻松问候`;
-  else nextAction = `维持当前节奏，下次联系约${expectedDays - days}天后`;
+  if (isNewlyAdded) {
+    nextAction = '补充关心细节和认识经过，让AI更好地帮你维护关系';
+  } else if (days > 90) {
+    nextAction = `发一条热身消息（如"最近怎样"），重建联系`;
+  } else if (days > expectedDays) {
+    nextAction = `通过${channel}发送一条轻松问候`;
+  } else {
+    nextAction = `维持当前节奏，下次联系约${expectedDays - days}天后`;
+  }
 
   return {
     summary,

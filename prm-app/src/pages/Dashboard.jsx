@@ -50,7 +50,7 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
       {/* 顶部问候区 */}
       <div style={{ marginBottom: 28 }}>
         <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-h)', marginBottom: 4 }}>
-          {greeting}，显华
+          {greeting}，道俊
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-dim)', display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
           <span>{dateStr} {weekDays[today.getDay()]}</span>
