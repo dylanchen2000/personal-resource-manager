@@ -21,21 +21,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install & Build
-        run: |
-          cd prm-app
-          npm install
-          npm run build
+          cache: npm
+          cache-dependency-path: prm-app/package-lock.json
+      - run: cd prm-app && npm ci && npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: prm-app/dist
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
