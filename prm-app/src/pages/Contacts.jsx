@@ -25,7 +25,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
   }
 
   const filtered = contacts.filter(c => {
-    if (search && !c.name?.includes(search) && !c.company?.includes(search) && !c.phone?.includes(search)) return false
+    if (search && !c.name?.includes(search) && !c.nickname?.includes(search) && !c.company?.includes(search) && !c.phone?.includes(search)) return false
     if (filterCircle && !c.circles?.includes(filterCircle)) return false
     if (filterFavor && c.favor !== filterFavor) return false
     if (filterStrategy && c.strategy !== filterStrategy) return false
