@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import { LayoutDashboard, Users, CircleDot, HeartHandshake, Share2, Download } from 'lucide-react'
+import { LayoutDashboard, Users, CircleDot, HeartHandshake, Share2, Upload } from 'lucide-react'
 import Dashboard from './pages/Dashboard'
 import Contacts from './pages/Contacts'
 import ContactDetail from './pages/ContactDetail'
 import Circles from './pages/Circles'
 import Favors from './pages/Favors'
 import SharePage from './pages/SharePage'
+import Import from './pages/Import'
 
 const NAV = [
   { id: 'dashboard', label: '仪表盘', icon: LayoutDashboard },
   { id: 'contacts', label: '联系人', icon: Users },
+  { id: 'import', label: '导入', icon: Upload },
   { id: 'circles', label: '圈子', icon: CircleDot },
   { id: 'favors', label: '人情', icon: HeartHandshake },
   { id: 'share', label: '分享', icon: Share2 },
@@ -44,6 +46,8 @@ export default function App() {
         return <ContactDetail key={selectedContactId} contactId={selectedContactId} onBack={goBack} onRefresh={refresh} />
       case 'circles':
         return <Circles key={refreshKey} onRefresh={refresh} />
+      case 'import':
+        return <Import key={refreshKey} onDone={() => setPage('contacts')} onRefresh={refresh} />
       case 'favors':
         return <Favors key={refreshKey} onOpenContact={openContact} />
       case 'share':
