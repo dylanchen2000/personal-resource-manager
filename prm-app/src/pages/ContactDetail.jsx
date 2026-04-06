@@ -151,9 +151,15 @@ export default function ContactDetail({ contactId, onBack, onRefresh }) {
           </div>
           <div style={{ flex: 1 }}>
             {editing ? (
-              <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} style={{ fontSize: 20, fontWeight: 700 }} />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} style={{ fontSize: 20, fontWeight: 700, flex: 1 }} placeholder="姓名" />
+                <input value={form.nickname || ''} onChange={e => setForm({ ...form, nickname: e.target.value })} style={{ fontSize: 14, flex: 1 }} placeholder="实际称呼（如：陶老师）" />
+              </div>
             ) : (
-              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-h)' }}>{contact.name}</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-h)' }}>
+                {contact.nickname || contact.name}
+                {contact.nickname && <span style={{ fontSize: 13, color: 'var(--text-dim)', fontWeight: 400, marginLeft: 8 }}>({contact.name})</span>}
+              </div>
             )}
             <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 2 }}>
               {[contact.company, contact.title].filter(Boolean).join(' | ')}

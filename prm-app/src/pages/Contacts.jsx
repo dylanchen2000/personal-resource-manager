@@ -63,7 +63,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
   }
 
   function openAdd() {
-    setForm({ name: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '', reminderFreq: null, birthday: '', details: '', howWeMet: '', giftIdeas: '', familyInfo: '' })
+    setForm({ name: '', nickname: '', phone: '', wechat: '', company: '', title: '', circles: [], favor: null, strategy: null, notes: '', privateNotes: '', favorDetail: '', reminderFreq: null, birthday: '', details: '', howWeMet: '', giftIdeas: '', familyInfo: '' })
     setShowModal(true)
   }
 
@@ -130,7 +130,7 @@ export default function Contacts({ onOpenContact, onRefresh }) {
                   {nameInitial(c.name)}
                 </div>
                 <div className="contact-info">
-                  <div className="name">{c.name}</div>
+                  <div className="name">{c.nickname || c.name}{c.nickname && <span style={{ fontSize: 12, color: 'var(--text-dim)', marginLeft: 6 }}>({c.name})</span>}</div>
                   <div className="sub">{[c.company, c.title].filter(Boolean).join(' | ')}</div>
                 </div>
                 <div className="contact-tags">
@@ -171,15 +171,21 @@ export default function Contacts({ onOpenContact, onRefresh }) {
                 <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="姓名" />
               </div>
               <div className="form-group">
-                <label>手机</label>
-                <input value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="手机号" />
+                <label>实际称呼</label>
+                <input value={form.nickname || ''} onChange={e => setForm({ ...form, nickname: e.target.value })} placeholder="如：陶老师、飞哥、老陶" />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
+                <label>手机</label>
+                <input value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="手机号" />
+              </div>
+              <div className="form-group">
                 <label>微信</label>
                 <input value={form.wechat || ''} onChange={e => setForm({ ...form, wechat: e.target.value })} placeholder="微信号" />
               </div>
+            </div>
+            <div className="form-row">
               <div className="form-group">
                 <label>公司</label>
                 <input value={form.company || ''} onChange={e => setForm({ ...form, company: e.target.value })} placeholder="所在公司" />

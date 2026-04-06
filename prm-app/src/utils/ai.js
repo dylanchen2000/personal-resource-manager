@@ -84,7 +84,7 @@ function ruleBasedMessageDraft(contact, interactions, favorRecords, occasion) {
   const tips = [];
 
   let message = '';
-  const name = contact.name || '朋友';
+  const name = contact.nickname || contact.name || '朋友';
 
   // 预热开场（超过90天未联系必须先寒暄）
   if (warmUpNeeded) {
