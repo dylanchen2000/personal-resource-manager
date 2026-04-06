@@ -127,6 +127,14 @@ export async function deleteContact(id) {
       await interactionsDB.removeItem(key)
     }
   }
+  // 同时删除相关人情记录
+  const favorKeys = await favorsDB.keys()
+  for (const key of favorKeys) {
+    const item = await favorsDB.getItem(key)
+    if (item && item.contactId === id) {
+      await favorsDB.removeItem(key)
+    }
+  }
 }
 
 // === 互动记录操作 ===

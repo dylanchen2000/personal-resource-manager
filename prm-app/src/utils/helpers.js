@@ -46,7 +46,7 @@ export function daysSince(ts) {
 
 // 格式化金额
 export function formatAmount(amount) {
-  if (!amount) return ''
+  if (amount === null || amount === undefined || amount === '') return ''
   const n = parseFloat(amount)
   if (isNaN(n)) return amount
   return n.toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })

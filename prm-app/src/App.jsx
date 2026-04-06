@@ -17,19 +17,21 @@ const NAV = [
 
 export default function App() {
   const [page, setPage] = useState('dashboard')
+  const [previousPage, setPreviousPage] = useState('contacts')
   const [selectedContactId, setSelectedContactId] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const refresh = () => setRefreshKey(k => k + 1)
 
   const openContact = (id) => {
+    setPreviousPage(page)
     setSelectedContactId(id)
     setPage('contact-detail')
   }
 
   const goBack = () => {
     setSelectedContactId(null)
-    setPage('contacts')
+    setPage(previousPage)
   }
 
   const renderPage = () => {
