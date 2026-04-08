@@ -503,7 +503,7 @@ textarea { resize: vertical; min-height: 80px; }
   background: rgba(96,165,250,0.05);
 }
 
-/* 响应式 */
+/* 响应式 - 平板 */
 @media (max-width: 768px) {
   .sidebar {
     width: 60px;
@@ -517,4 +517,44 @@ textarea { resize: vertical; min-height: 80px; }
   .main-content { margin-left: 60px; padding: 16px; }
   .form-row { grid-template-columns: 1fr; }
   .card-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+
+/* 响应式 - 手机：底部导航 */
+@media (max-width: 480px) {
+  .sidebar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    width: 100%; height: auto;
+    flex-direction: row;
+    padding: 0;
+    border-top: 1px solid var(--border);
+    border-right: none;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .sidebar-brand { display: none; }
+  .sidebar-nav {
+    display: flex; flex-direction: row;
+    padding: 0; width: 100%;
+    justify-content: space-around;
+  }
+  .nav-item {
+    flex-direction: column; padding: 8px 4px;
+    font-size: 10px; gap: 2px; min-width: 0;
+    flex: 1; justify-content: center; align-items: center;
+    border-radius: 0;
+  }
+  .nav-item span { display: block; font-size: 10px; }
+  .nav-item.active { background: transparent; color: var(--accent); }
+  .main-content {
+    margin-left: 0; padding: 12px 12px 80px;
+  }
+  /* 仪表盘卡片 */
+  .stat-cards { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .dash-metrics { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .dash-cards-row { grid-template-columns: 1fr !important; }
+  .form-row { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  /* 联系人详情tabs */
+  .detail-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+  .detail-tab { white-space: nowrap; flex-shrink: 0; }
 }

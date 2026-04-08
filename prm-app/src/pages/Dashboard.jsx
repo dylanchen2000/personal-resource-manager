@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { AlertTriangle, HeartHandshake, Shield, Users, CircleDot, MessageSquare, Clock, Cake, Zap, TrendingUp, Sparkles, ChevronRight, UserPlus } from 'lucide-react'
 import { getStats, getCircles, getHealthColor, getContactDueInfo, bulkSnooze } from '../utils/store'
 import { nameColor, nameInitial, timeAgo } from '../utils/helpers'
-import { getNextFestival } from '../utils/ai'
+import { getNextFestival, generateMessageDraft } from '../utils/ai'
 
 export default function Dashboard({ onOpenContact, onNavigate }) {
   const [stats, setStats] = useState(null)
   const [circles, setCircles] = useState([])
   const [snoozing, setSnoozing] = useState(false)
+  const [blessingFor, setBlessingFor] = useState(null) // {contactId, message, loading}
+
 
   useEffect(() => {
     getStats().then(setStats)
@@ -21,6 +23,34 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
     alert(`已分散 ${count} 条提醒到未来14天`)
     setSnoozing(false)
     getStats().then(setStats)
+  }
+
+  async function handleBlessing(contact) {
+    setBlessingFor({ contactId: contact.id, message: '', loading: true })
+    try {
+      const result = await generateMessageDraft(contact, [], [], '生日祝福')
+      setBlessingFor({ contactId: contact.id, message: result.message, tips: result.tips, channel: result.channel, loading: false })
+    } catch {
+      const name = contact.nickname || contact.name || '朋友'
+      setBlessingFor({ contactId: contact.id, message: `${name}，生日快乐！祝你万事如意，心想事成！`, tips: [], loading: false })
+    }
+  }
+
+  function copyBlessing() {
+    if (blessingFor?.message) {
+      navigator.clipboard.writeText(blessingFor.message).then(() => {
+        alert('已复制到剪贴板')
+      }).catch(() => {
+        // fallback: select text
+        const ta = document.createElement('textarea')
+        ta.value = blessingFor.message
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+        alert('已复制到剪贴板')
+      })
+    }
   }
 
   if (!stats) return <div className="empty-state"><p>加载中...</p></div>
@@ -63,7 +93,7 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
       </div>
 
       {/* 核心指标卡片 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="dash-metrics" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
         <div className="dash-metric" onClick={() => onNavigate('contacts')} style={{ cursor: 'pointer' }}>
           <div className="dash-metric-icon" style={{ background: 'rgba(96,165,250,0.12)', color: 'var(--accent)' }}><Users size={20} /></div>
           <div className="dash-metric-num">{stats.totalContacts}</div>
@@ -87,7 +117,7 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
       </div>
 
       {/* 关系健康度 + 策略分布 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div className="dash-cards-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
         {/* 健康度分布 */}
         <div className="card" style={{ padding: 18 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -150,8 +180,9 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
                 <div style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: 14 }}>{displayName(c)}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{c.birthday} {c.circles?.length ? `| ${c.circles.join(', ')}` : ''}</div>
               </div>
-              <button className="btn btn-sm" style={{ fontSize: 11, color: 'var(--pink)', borderColor: 'rgba(244,114,182,0.3)' }}>
-                <Sparkles size={11} /> 生成祝福
+              <button className="btn btn-sm" style={{ fontSize: 11, color: 'var(--pink)', borderColor: 'rgba(244,114,182,0.3)' }}
+                onClick={(e) => { e.stopPropagation(); handleBlessing(c) }}>
+                <Sparkles size={11} /> {blessingFor?.contactId === c.id && blessingFor.loading ? '生成中...' : '生成祝福'}
               </button>
             </div>
           ))}
@@ -226,7 +257,7 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
       )}
 
       {/* 人情提醒 + 需要关注 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div className="dash-cards-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
         {/* 人情提醒 */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -290,6 +321,34 @@ export default function Dashboard({ onOpenContact, onNavigate }) {
                 <span style={{ fontSize: 12, color: ci.color, fontWeight: 700 }}>{ci.count}</span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 祝福弹窗 */}
+      {blessingFor && !blessingFor.loading && blessingFor.message && (
+        <div className="modal-overlay" onClick={() => setBlessingFor(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Sparkles size={18} color="var(--pink)" /> 生日祝福
+            </h3>
+            <div style={{ background: 'rgba(244,114,182,0.06)', border: '1px solid rgba(244,114,182,0.15)', borderRadius: 12, padding: 16, fontSize: 15, lineHeight: 1.8, color: 'var(--text-h)', whiteSpace: 'pre-wrap' }}>
+              {blessingFor.message}
+            </div>
+            {blessingFor.channel && (
+              <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 10 }}>
+                推荐渠道：{blessingFor.channel}
+              </div>
+            )}
+            {blessingFor.tips?.length > 0 && (
+              <div style={{ fontSize: 12, color: 'var(--accent)', marginTop: 8 }}>
+                {blessingFor.tips.map((t, i) => <div key={i}>- {t}</div>)}
+              </div>
+            )}
+            <div className="modal-footer">
+              <button className="btn" onClick={() => setBlessingFor(null)}>关闭</button>
+              <button className="btn btn-primary" onClick={copyBlessing}>复制文案</button>
+            </div>
           </div>
         </div>
       )}

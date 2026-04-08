@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Upload, FileSpreadsheet, Contact, Zap, Download, Check, AlertTriangle, Plus, Trash2 } from 'lucide-react'
 import { saveContact, getCircles, getContacts } from '../utils/store'
 import * as XLSX from 'xlsx'
@@ -73,14 +73,14 @@ export default function Import({ onDone, onRefresh }) {
     { name: '', nickname: '', circles: [] }
   ])
 
-  useState(() => {
+  useEffect(() => {
     (async () => {
       const ci = await getCircles()
       setCircles(ci)
       const contacts = await getContacts()
       setExistingNames(new Set(contacts.map(c => c.name)))
     })()
-  })
+  }, [])
 
   // ─── Excel/CSV 导入 ────────────────────────────
 
